@@ -4,7 +4,10 @@ use ash::vk;
 use core::{mem, ops::Range};
 use hashbrown::hash_map::Entry;
 
-const ALLOCATION_GRANULARITY: u32 = 16;
+// Command buffers are allocated one at a time and reused through `free` once reset. Allocating 16 at a time left
+// most of them unused for an encoder that records one at a time, and some drivers (Mesa ANV) set aside about 70 KB
+// of host memory for each command buffer when it is allocated.
+const ALLOCATION_GRANULARITY: u32 = 1;
 const DST_IMAGE_LAYOUT: vk::ImageLayout = vk::ImageLayout::TRANSFER_DST_OPTIMAL;
 
 impl super::Texture {
